@@ -38,6 +38,8 @@ const swiper = new Swiper(".swiper", {
 
 const hideSwiper = document.querySelector(".swiper");
 
+let isMoreVisible = false;
+
 setInterval(() => {
   if (window.innerWidth >= 768) {
     hideSwiper.style.display = "none";
@@ -46,38 +48,31 @@ setInterval(() => {
   }
 }, 0);
 
-function handleShowAndHide() {
+function showItems() {
+  let toShow = window.innerWidth <= 1120 ? 6 : 8;
+
   slides.forEach((item, index) => {
-    item.classList.add("slide-show");
-    if (window.innerWidth >= 768 && window.innerWidth < 1120 && index >= 6) {
-      item.classList.add("slide-hide");
-    } else if (window.innerWidth >= 1120 && index >= 8) {
-      item.classList.add("slide-hide");
+    if (index < toShow) {
+      item.style.display = "flex";
+    } else {
+      item.style.display = "none";
     }
   });
 }
 
-function handleClick() {
+function toggleMoreItems() {
+  isMoreVisible = !isMoreVisible;
+
   slides.forEach((item, index) => {
-    if (window.innerWidth >= 1120 && index >= 8) {
-      item.classList.toggle("slide-hide");
-    } else if (
-      window.innerWidth >= 768 &&
-      window.innerWidth < 1120 &&
-      index > 6
-    ) {
-      item.classList.toggle("slide-hide");
-    }
-    if (button.innerHTML === "Показать все") {
-      button.innerHTML = "Скрыть";
-      button.classList.remove("btn-show");
-      button.classList.add("btn-hide");
-    } else {
-      button.innerHTML = "Показать все";
-      button.classList.remove("btn-hide");
-      button.classList.add("btn-show");
+    if (index >= (window.innerWidth < 1120 ? 6 : 8)) {
+      item.style.display = isMoreVisible ? "flex" : "none";
     }
   });
+
+  isMoreVisible
+    ? (button.classList.add("btn-hide"), button.classList.remove("btn-show"))
+    : (button.classList.add("btn-show"), button.classList.remove("btn-hide"));
+  button.innerHTML = isMoreVisible ? "Скрыть" : "Показать все";
 }
 
 let slides = document.querySelectorAll(".content__slide");
@@ -85,15 +80,6 @@ let button = document.querySelector(".content__button");
 
 console.log(slides);
 
-window.addEventListener("showAndHide", handleShowAndHide);
-window.addEventListener("click", handleClick);
-
-handleShowAndHide();
-// showAndHide(
-//   button,
-//   downloadMore,
-//   arrowsButton,
-//   newText,
-//   "Показать все",
-//   "Скрыть"
-// );
+window.addEventListener("resize", showItems);
+button.addEventListener("click", toggleMoreItems);
+document.addEventListener("DOMContentLoaded", showItems);
